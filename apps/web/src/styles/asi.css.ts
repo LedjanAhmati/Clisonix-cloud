@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ASI Styles with Vanilla Extract
  * ===============================
  * 
@@ -367,3 +367,4 @@ export const terminalDotYellow = style([terminalDot, {
 export const terminalDotGreen = style([terminalDot, {
   background: theme.colors.success
 }]);
+

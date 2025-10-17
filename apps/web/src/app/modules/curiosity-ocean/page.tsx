@@ -49,6 +49,7 @@ export default function CuriosityOcean() {
   const [isExploring, setIsExploring] = useState(false);
   const [userCuriosityLevel, setUserCuriosityLevel] = useState<'curious' | 'wild' | 'chaos' | 'genius'>('curious');
   const [loading, setLoading] = useState(true);
+  const [randomValue, setRandomValue] = useState(0);
   const questionInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -96,6 +97,10 @@ export default function CuriosityOcean() {
     fetchOceanData();
     const interval = setInterval(fetchOceanData, 5000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    setRandomValue(Math.floor(Math.random() * 100));
   }, []);
 
   const exploreQuestion = async (question: string) => {
@@ -226,8 +231,8 @@ export default function CuriosityOcean() {
           <p className="text-blue-300">ASI Trinity is awakening...</p>
           <div className="mt-4 flex justify-center space-x-4">
             <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce"></div>
-            <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-            <div className="w-3 h-3 bg-teal-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+            <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce animation-delay-100"></div>
+            <div className="w-3 h-3 bg-teal-400 rounded-full animate-bounce animation-delay-200"></div>
           </div>
         </div>
       </div>
@@ -407,6 +412,7 @@ export default function CuriosityOcean() {
             </div>
           </div>
         )}
+        <p className="text-xs text-blue-500 mt-1">+{randomValue}/min</p>
       </div>
     </div>
   );

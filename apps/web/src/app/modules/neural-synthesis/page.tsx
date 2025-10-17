@@ -1,4 +1,4 @@
-/**
+﻿/**
  * JONA - Neural Audio Synthesis Module  
  * Joyful Overseer of Neural Alignment - Brain-Data Art & Real-time Monitoring
  */
@@ -6,6 +6,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
+import { cva } from 'class-variance-authority'
 import Link from 'next/link'
 
 interface AudioSynthesis {
@@ -25,6 +26,69 @@ interface JonaStatus {
 }
 
 export default function NeuralSynthesisPage() {
+  // CVA for waveform bar height
+  const waveformBar = cva('w-3 bg-gradient-to-t rounded-sm transition-all duration-200', {
+    variants: {
+      height: {
+        h10: 'h-2.5',
+        h20: 'h-5',
+        h30: 'h-7',
+        h40: 'h-10',
+        h50: 'h-12',
+        h60: 'h-16',
+        h70: 'h-20',
+        h80: 'h-24',
+        h90: 'h-28',
+        h100: 'h-32',
+      }
+    },
+    defaultVariants: {
+      height: 'h20'
+    }
+  })
+  // Play Symphony handler
+  const playSymphony = async () => {
+    try {
+      const res = await fetch('/api/neural-symphony');
+      const audioBlob = await res.blob();
+      const url = URL.createObjectURL(audioBlob);
+      const audio = new Audio(url);
+      audio.play();
+    } catch (err) {
+      alert('Failed to play symphony');
+    }
+  };
+
+  // Save Recording handler
+  const saveRecording = async () => {
+    try {
+      const res = await fetch('/api/neural-symphony');
+      const audioBlob = await res.blob();
+      const url = URL.createObjectURL(audioBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'neural_symphony.wav';
+      a.click();
+    } catch (err) {
+      alert('Failed to save recording');
+    }
+  };
+
+  // Share Art handler (demo)
+  const shareArt = () => {
+    alert('Share functionality coming soon!');
+  };
+
+  // Biofeedback Training handlers
+  const startAlphaTraining = () => {
+    alert('Alpha Training started!');
+  };
+  const startThetaTraining = () => {
+    alert('Theta Training started!');
+  };
+  const startBetaTraining = () => {
+    alert('Beta Training started!');
+  };
   const [audioSynthesis, setAudioSynthesis] = useState<AudioSynthesis>({
     is_active: false,
     neural_frequency: 0,
@@ -32,6 +96,8 @@ export default function NeuralSynthesisPage() {
     symphony_progress: 0,
     biofeedback_level: 0
   })
+  // waveform heights for visualization
+  const [waveformHeights, setWaveformHeights] = useState<number[]>(Array(20).fill(20));
   
   const [jonaStatus, setJonaStatus] = useState<JonaStatus>({
     status: 'offline',
@@ -62,13 +128,23 @@ export default function NeuralSynthesisPage() {
     // Simulate audio synthesis data
     const updateAudioSynthesis = () => {
       if (isRecording) {
+        const now = Date.now();
+        const freq = 8 + Math.sin(now / 1000) * 5;
         setAudioSynthesis(prev => ({
           is_active: true,
-          neural_frequency: 8 + Math.sin(Date.now() / 1000) * 5, // Alpha wave simulation
-          audio_output: getAudioNote(8 + Math.sin(Date.now() / 1000) * 5),
+          neural_frequency: freq,
+          audio_output: getAudioNote(freq),
           symphony_progress: Math.min(prev.symphony_progress + 2, 100),
           biofeedback_level: 60 + Math.random() * 40
         }))
+        // update waveform heights
+        setWaveformHeights(
+          Array.from({ length: 20 }, (_, idx) =>
+            Math.max(Math.sin((now / 100) + idx) * 50 + 50, 10)
+          )
+        );
+      } else {
+        setWaveformHeights(Array(20).fill(20));
       }
     }
 
@@ -170,8 +246,8 @@ export default function NeuralSynthesisPage() {
               </div>
               <div className="w-full bg-gray-700 rounded-full h-2">
                 <div 
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${audioSynthesis.symphony_progress}%` }}
+                  className={`bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300 symphony-progress-bar`}
+                  data-progress={audioSynthesis.symphony_progress}
                 ></div>
               </div>
             </div>
@@ -211,22 +287,30 @@ export default function NeuralSynthesisPage() {
           </h3>
           
           <div className="bg-black/30 rounded-lg p-4 h-48 flex items-end justify-center space-x-1">
-            {Array.from({ length: 20 }, (_, idx) => (
-              <div
-                key={idx}
-                className={`w-3 bg-gradient-to-t rounded-sm transition-all duration-200 ${
-                  audioSynthesis.is_active 
-                    ? 'from-purple-500 to-pink-500' 
-                    : 'from-gray-600 to-gray-500'
-                }`}
-                style={{ 
-                  height: `${audioSynthesis.is_active 
-                    ? Math.max(Math.sin((Date.now() / 100) + idx) * 50 + 50, 10)
-                    : 20
-                  }px` 
-                }}
-              ></div>
-            ))}
+            {waveformHeights.map((height, idx) => {
+              // Map height value to nearest CVA class
+              let hClass: "h10" | "h20" | "h30" | "h40" | "h50" | "h60" | "h70" | "h80" | "h90" | "h100" = "h20";
+              if (height >= 100) hClass = "h100";
+              else if (height >= 90) hClass = "h90";
+              else if (height >= 80) hClass = "h80";
+              else if (height >= 70) hClass = "h70";
+              else if (height >= 60) hClass = "h60";
+              else if (height >= 50) hClass = "h50";
+              else if (height >= 40) hClass = "h40";
+              else if (height >= 30) hClass = "h30";
+              else if (height >= 20) hClass = "h20";
+              else hClass = "h10";
+              return (
+                <div
+                  key={idx}
+                  className={
+                    waveformBar({
+                      height: hClass
+                    }) + ` ${audioSynthesis.is_active ? 'from-purple-500 to-pink-500' : 'from-gray-600 to-gray-500'}`
+                  }
+                ></div>
+              );
+            })}
           </div>
           
           <div className="text-xs text-gray-500 text-center mt-2">
@@ -288,13 +372,13 @@ export default function NeuralSynthesisPage() {
             </div>
             
             <div className="flex justify-center space-x-4">
-              <button className="px-6 py-2 bg-purple-500/30 text-purple-300 rounded-lg hover:bg-purple-500/40 transition-colors">
+              <button className="px-6 py-2 bg-purple-500/30 text-purple-300 rounded-lg hover:bg-purple-500/40 transition-colors" onClick={playSymphony}>
                 ▶️ Play Symphony
               </button>
-              <button className="px-6 py-2 bg-pink-500/30 text-pink-300 rounded-lg hover:bg-pink-500/40 transition-colors">
+              <button className="px-6 py-2 bg-pink-500/30 text-pink-300 rounded-lg hover:bg-pink-500/40 transition-colors" onClick={saveRecording}>
                 💾 Save Recording
               </button>
-              <button className="px-6 py-2 bg-cyan-500/30 text-cyan-300 rounded-lg hover:bg-cyan-500/40 transition-colors">
+              <button className="px-6 py-2 bg-cyan-500/30 text-cyan-300 rounded-lg hover:bg-cyan-500/40 transition-colors" onClick={shareArt}>
                 📤 Share Art
               </button>
             </div>
@@ -323,13 +407,13 @@ export default function NeuralSynthesisPage() {
                 </div>
               </div>
               <div className="flex space-x-2">
-                <button className="p-2 text-purple-400 hover:text-purple-300 transition-colors">
+                <button className="p-2 text-purple-400 hover:text-purple-300 transition-colors" onClick={playSymphony}>
                   ▶️
                 </button>
-                <button className="p-2 text-cyan-400 hover:text-cyan-300 transition-colors">
+                <button className="p-2 text-cyan-400 hover:text-cyan-300 transition-colors" onClick={shareArt}>
                   📤
                 </button>
-                <button className="p-2 text-gray-400 hover:text-gray-300 transition-colors">
+                <button className="p-2 text-gray-400 hover:text-gray-300 transition-colors" onClick={saveRecording}>
                   💾
                 </button>
               </div>
@@ -345,17 +429,17 @@ export default function NeuralSynthesisPage() {
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 hover:from-blue-500/30 hover:to-cyan-500/30 rounded-lg p-4 border border-blue-500/30 transition-all duration-300">
+          <button className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 hover:from-blue-500/30 hover:to-cyan-500/30 rounded-lg p-4 border border-blue-500/30 transition-all duration-300" onClick={startAlphaTraining}>
             <div className="text-lg font-semibold text-blue-400">🌊 Alpha Training</div>
             <div className="text-sm text-gray-400 mt-1">Relaxation & calm focus</div>
           </button>
           
-          <button className="bg-gradient-to-r from-purple-500/20 to-violet-500/20 hover:from-purple-500/30 hover:to-violet-500/30 rounded-lg p-4 border border-purple-500/30 transition-all duration-300">
+          <button className="bg-gradient-to-r from-purple-500/20 to-violet-500/20 hover:from-purple-500/30 hover:to-violet-500/30 rounded-lg p-4 border border-purple-500/30 transition-all duration-300" onClick={startThetaTraining}>
             <div className="text-lg font-semibold text-purple-400">🧠 Theta Training</div>
             <div className="text-sm text-gray-400 mt-1">Deep meditation states</div>
           </button>
           
-          <button className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 hover:from-green-500/30 hover:to-emerald-500/30 rounded-lg p-4 border border-green-500/30 transition-all duration-300">
+          <button className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 hover:from-green-500/30 hover:to-emerald-500/30 rounded-lg p-4 border border-green-500/30 transition-all duration-300" onClick={startBetaTraining}>
             <div className="text-lg font-semibold text-green-400">⚡ Beta Training</div>
             <div className="text-sm text-gray-400 mt-1">Focus & concentration</div>
           </button>
@@ -364,3 +448,4 @@ export default function NeuralSynthesisPage() {
     </div>
   )
 }
+

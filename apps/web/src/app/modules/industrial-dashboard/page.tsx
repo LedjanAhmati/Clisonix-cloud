@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Industrial Dashboard - Real System Monitoring
  * REAL DATA ONLY - No mock, no fake, no Math.random()
  */
@@ -227,7 +227,9 @@ export default function IndustrialDashboard() {
                 <div className="flex justify-between">
                   <span className="text-gray-300">Memory:</span>
                   <span className="text-gray-400">
-                    {backendHealth.memory.used}/{backendHealth.memory.total} MB
+                    {backendHealth.memory
+                      ? `${backendHealth.memory.used}/${backendHealth.memory.total} MB`
+                      : 'N/A'}
                   </span>
                 </div>
               </div>
@@ -286,3 +288,4 @@ export default function IndustrialDashboard() {
     </div>
   );
 }
+

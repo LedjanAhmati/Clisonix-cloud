@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ALBI - EEG Analysis Module
  * Neural Frequency Laboratory Director - EEG Processing & Brain Signal Analysis
  */
@@ -294,3 +294,4 @@ export default function EEGAnalysisPage() {
     </div>
   )
 }
+

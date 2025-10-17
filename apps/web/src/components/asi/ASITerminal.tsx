@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ASI Terminal Component
  * =====================
  * 
@@ -272,3 +272,4 @@ export function ASITerminal({ className, maxCommands = 10 }: ASITerminalProps) {
     </div>
   );
 }
+

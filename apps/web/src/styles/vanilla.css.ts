@@ -1,4 +1,4 @@
-// Vanilla Extract CSS Styles
+﻿// Vanilla Extract CSS Styles
 // Type-safe CSS-in-JS me vanilla-extract
 
 import { style, styleVariants, globalStyle, keyframes } from "@vanilla-extract/css";
@@ -226,3 +226,4 @@ export const showOnMobile = style({
     },
   },
 });
+

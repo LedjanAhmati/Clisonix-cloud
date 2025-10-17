@@ -1,4 +1,4 @@
-/**
+﻿/**
  * NeuroSonix Modules Hub - Industrial Dashboard Access
  * ALBI (EEG Processing) + ALBA (Data Collection) + JONA (Neural Alignment & Audio Synthesis)
  */
@@ -258,3 +258,4 @@ export default function ModulesPage() {
     </div>
   )
 }
+

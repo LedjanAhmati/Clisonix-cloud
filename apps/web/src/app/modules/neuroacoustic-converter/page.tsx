@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 🧠 Neuroacoustic Converter
  * Real-time EEG to Audio signal conversion with advanced processing
  */
@@ -426,3 +426,4 @@ export default function NeuroacousticConverterPage() {
     </div>
   )
 }
+

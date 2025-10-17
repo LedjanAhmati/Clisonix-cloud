@@ -75,7 +75,7 @@ python start_server.py
 python start_server.py
 
 # Method 2: Direct uvicorn
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn app.master:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ### 3. Access Industrial Backend
@@ -273,7 +273,7 @@ pip install -r requirements.txt
 python start_server.py
 
 # Run with auto-reload
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app.master:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### Testing

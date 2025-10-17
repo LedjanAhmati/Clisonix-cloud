@@ -1,49 +1,33 @@
+"""
+Dashboard Routes - Industrial API
+Author: Ledjan Ahmati
+License: Closed Source
+"""
+
 from fastapi import APIRouter, HTTPException
-from typing import Dict, Any
-from datetime import datetime
+import time
+import psutil
 
 router = APIRouter()
 
-@router.get("/services/status")
-async def get_services_status():
-    """Get status of all dashboard services"""
+@router.get("/dashboard/status", tags=["Dashboard"])
+def get_dashboard_status():
+    """Kthen statusin real të dashboard-it industrial."""
     return {
-        "services": {
-            "backend_api": {
-                "name": "Backend API",
-                "url": "http://localhost:8000",
-                "status": "online",
-                "icon": "🔧"
-            },
-            "agi_dashboard": {
-                "name": "AGI Dashboard", 
-                "url": "http://localhost:8000/api/agi",
-                "status": "online",
-                "icon": "🧠"
-            },
-            "neurosonix": {
-                "name": "NeuroSonix Engine",
-                "url": "http://localhost:8000/api/neurosonix", 
-                "status": "online",
-                "icon": "🎵"
-            },
-            "world_brain": {
-                "name": "World Brain",
-                "url": "http://localhost:8000/api/world-brain",
-                "status": "online", 
-                "icon": "🌍"
-            }
-        },
-        "timestamp": datetime.now().isoformat()
+        "status": "active",
+        "timestamp": time.time(),
+        "cpu_percent": psutil.cpu_percent(),
+        "memory": psutil.virtual_memory()._asdict(),
+        "disk": psutil.disk_usage("/")._asdict(),
+        "hostname": psutil.users()[0].name if psutil.users() else "unknown"
     }
 
-@router.get("/overview")
-async def get_dashboard_overview():
-    """Get dashboard overview data"""
+@router.get("/dashboard/metrics", tags=["Dashboard"])
+def get_dashboard_metrics():
+    """Kthen metrika reale të dashboard-it industrial."""
     return {
-        "total_services": 4,
-        "active_services": 4,
-        "system_health": "excellent",
-        "uptime": "99.9%",
-        "last_update": datetime.now().isoformat()
+        "uptime": time.time() - psutil.boot_time(),
+        "process_count": len(psutil.pids()),
+        "load_avg": psutil.getloadavg() if hasattr(psutil, "getloadavg") else None,
+        "timestamp": time.time()
     }

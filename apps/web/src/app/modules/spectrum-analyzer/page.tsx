@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 📊 Spectrum Analyzer
  * Multi-band EEG frequency analysis with real-time FFT visualization
  */
@@ -455,3 +455,4 @@ export default function SpectrumAnalyzerPage() {
     </div>
   )
 }
+

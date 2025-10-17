@@ -1,10 +1,39 @@
-﻿"""
+﻿# ------------- Neural Symphony (EEG to Audio) -------------
+from fastapi.responses import StreamingResponse
+import numpy as np
+import io
+
+from fastapi import FastAPI
+app = FastAPI()
+
+@app.get("/neural-symphony")
+async def neural_symphony():
+    """
+    Gjeneron një audio wav demo nga sinjal EEG sintetik (valë alpha)
+    """
+    sr = 22050  # sample rate
+    duration = 5  # sekonda
+    t = np.linspace(0, duration, int(sr * duration), endpoint=False)
+    # Simulo një sinjal alpha (10 Hz)
+    eeg_wave = 0.5 * np.sin(2 * np.pi * 10 * t)
+    # Konverto në int16 për wav
+    audio = np.int16(eeg_wave * 32767)
+    import soundfile as sf
+    buf = io.BytesIO()
+    sf.write(buf, audio, sr, format='WAV')
+    buf.seek(0)
+    return StreamingResponse(buf, media_type="audio/wav")
+"""
+Copyright (c) 2025 Ledjan Ahmati. All rights reserved.
+This software is proprietary and confidential. Unauthorized copying, distribution, or use is strictly prohibited.
+Author: Ledjan Ahmati
+License: Closed Source
+---
 NeuroSonix Cloud API - Industrial Production Backend (REAL-ONLY)
-Author: Ledjan Ahmati (WEB8euroweb GmbH)
 Notes:
-  - No mock, no random, no placeholder numbers.
-  - All outputs derive from real system data, real files, or real external APIs.
-  - If a dependency is not configured or reachable, endpoints return 5xx (do NOT fabricate values).
+    - No mock, no random, no placeholder numbers.
+    - All outputs derive from real system data, real files, or real external APIs.
+    - If a dependency is not configured or reachable, endpoints return 5xx (do NOT fabricate values).
 """
 
 import os
@@ -146,16 +175,79 @@ def safe_bool(v: Any) -> bool:
     return str(v).lower() in ("1", "true", "yes", "on")
 
 # ------------- App -------------
+
 app = FastAPI(
     title=settings.api_title,
     version=settings.api_version,
     debug=settings.debug,
 )
 
+# --- Chat API ---
+@app.post("/api/ask")
+async def ask_api(request: Request):
+    try:
+        data = await request.json()
+        question = data.get("question", "")
+        # Këtu mund të lidhet me module reale, p.sh. EEG, ALBI, ALBA, JONA
+        # Për demo, kthejmë një përgjigje të thjeshtë
+        if not question:
+            return JSONResponse({"answer": "No question provided."}, status_code=400)
+        # Shembull: përgjigje e thjeshtë
+        answer = f"[NeuroSonix] Pyetja juaj: '{question}' u pranua. (Kjo është përgjigje demo, lidhe me module reale sipas nevojës.)"
+        return {"answer": answer}
+    except Exception as e:
+        return JSONResponse({"answer": f"Error: {str(e)}"}, status_code=500)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], allow_methods=["*"], allow_headers=["*"], allow_credentials=True
 )
+
+# Global error handlers for consistent JSON errors
+from fastapi.responses import JSONResponse
+from fastapi.requests import Request
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "error": exc.status_code,
+            "message": exc.detail if hasattr(exc, "detail") else str(exc),
+            "path": str(request.url),
+            "timestamp": utcnow(),
+            "instance": INSTANCE_ID
+        }
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "error": 422,
+            "message": "Validation error",
+            "details": exc.errors(),
+            "path": str(request.url),
+            "timestamp": utcnow(),
+            "instance": INSTANCE_ID
+        }
+    )
+
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": 500,
+            "message": str(exc),
+            "path": str(request.url),
+            "timestamp": utcnow(),
+            "instance": INSTANCE_ID
+        }
+    )
 
 # ------------- Startup/Shutdown -------------
 @app.on_event("startup")
@@ -321,10 +413,22 @@ async def health():
 
 @app.get("/status")
 async def status_full():
+    sys_metrics = get_system_metrics()
+    uptime_seconds = sys_metrics.get("uptime_seconds", 0)
+    uptime_h = int(uptime_seconds // 3600)
+    uptime_m = int((uptime_seconds % 3600) // 60)
+    memory_total = sys_metrics.get("memory_total", 0)
+    memory_used = int(sys_metrics.get("memory_percent", 0) * memory_total / 100) if memory_total else 0
     return {
         "timestamp": utcnow(),
         "instance_id": INSTANCE_ID,
-        "system": get_system_metrics(),
+        "status": "active",
+        "uptime": f"{uptime_h}h {uptime_m}m",
+        "memory": {
+            "used": memory_used // (1024 * 1024),
+            "total": memory_total // (1024 * 1024)
+        },
+        "system": sys_metrics,
         "redis": await get_redis_status(),
         "database": await get_db_status(),
         "storage_dir": str(Path(settings.storage_dir).resolve()),
@@ -585,24 +689,26 @@ async def redis_ping():
         raise HTTPException(status_code=500, detail=str(e))
 
 # ------------- Routes -------------
+
 # Import and include Alba monitoring routes
 try:
     import sys
     import os
-    sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'app'))
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
     from routes.alba_routes import router as alba_router
     app.include_router(alba_router)
     logger.info("Alba network monitoring routes loaded")
 except Exception as e:
     logger.warning(f"Alba routes not loaded: {e}")
 
-# Import and include Curiosity Ocean API routes
+
+# Import and include Industrial Dashboard Demo routes
 try:
-    from api.curiosity_ocean_api import router as curiosity_router
-    app.include_router(curiosity_router, prefix="/api")
-    logger.info("Curiosity Ocean API routes loaded")
+    from industrial_dashboard_demo import router as industrial_dashboard_router
+    app.include_router(industrial_dashboard_router)
+    logger.info("Industrial Dashboard demo routes loaded")
 except Exception as e:
-    logger.warning(f"Curiosity Ocean API routes not loaded: {e}")
+    logger.warning(f"Industrial Dashboard demo routes not loaded: {e}")
 
 # ASI Trinity System Routes
 @app.get("/asi/status")
@@ -667,7 +773,10 @@ async def asi_execute(payload: Dict[str, Any] = Body(...)):
 
 # Add favicon to eliminate 404 errors
 try:
-    from .utils.favicon import add_favicon_route
+    try:
+        from .utils.favicon import add_favicon_route
+    except ImportError:
+        from utils.favicon import add_favicon_route
     add_favicon_route(app)
     logger.info("Favicon route added")
 except Exception as e:

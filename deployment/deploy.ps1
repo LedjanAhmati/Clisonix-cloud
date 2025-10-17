@@ -1,0 +1,18 @@
+# deploy.ps1 - Neurosonix Cloud Industrial Deployment Script
+# Author: Ledjan Ahmati
+# License: Closed Source
+
+Write-Host "🚀 Neurosonix Cloud Industrial Deployment Starting..."
+
+# Step 1: Build Docker images
+Write-Host "🔨 Building Docker images..."
+docker compose build
+
+# Step 2: Restart Docker services
+Write-Host "🔄 Restarting Docker services..."
+docker compose up -d
+
+# Step 3: Health check (optional)
+# You can add health check logic here if needed
+
+Write-Host "✅ Deployment complete!"

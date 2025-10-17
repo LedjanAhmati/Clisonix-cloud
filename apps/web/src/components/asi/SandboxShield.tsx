@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Sandbox Shield Component
  * =======================
  * 
@@ -255,3 +255,4 @@ export function SandboxShield({ className }: SandboxShieldProps) {
     </div>
   );
 }
+

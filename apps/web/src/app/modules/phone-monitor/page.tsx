@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Phone Monitor v3.0 - Industrial Mobile Neural Interface
  * Advanced Communication Analysis & Real-time Monitoring
  * REAL DATA ONLY - Full Industrial Grade System
@@ -906,3 +906,4 @@ export default function PhoneMonitor() {
     </div>
   );
 }
+

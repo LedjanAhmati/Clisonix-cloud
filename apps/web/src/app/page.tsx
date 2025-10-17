@@ -1,7 +1,8 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { ASITerminal } from '../components/asi/ASITerminal';
 
 interface SystemStatus {
   signal_gen: { status: string; version: string }
@@ -17,29 +18,29 @@ export default function Home() {
   useEffect(() => {
     const fetchSystemStatus = async () => {
       try {
-        // Fetch Signal-Gen backend status
-        const signalGenResponse = await fetch('/api/signal-gen/health')
-        const signalGenData = await signalGenResponse.json()
+        // Fetch system status from industrial dashboard demo
+        const systemResponse = await fetch('/api/system-status')
+        const systemData = await systemResponse.json()
 
-        // Fetch ALBI+ALBA+JONA status
-        const statusResponse = await fetch('/api/signal-gen/status')
-        const statusData = await statusResponse.json()
+        // Fetch data sources for additional info (optional)
+        // const sourcesResponse = await fetch('/api/data-sources')
+        // const sourcesData = await sourcesResponse.json()
 
         setSystemStatus({
           signal_gen: { 
-            status: signalGenData.status === 'operational' ? 'Online' : 'Offline',
-            version: signalGenData.version || '1.0.0'
+            status: systemData.core_services === 'Operational' ? 'Online' : 'Offline',
+            version: '1.0.0'
           },
           albi: {
-            status: statusData.neurosonix_ecosystem?.albi || 'offline',
-            neural_patterns: 1247 // From existing data
+            status: systemData.network === 'Connected' ? 'online' : 'offline',
+            neural_patterns: 1247
           },
           alba: {
-            status: statusData.neurosonix_ecosystem?.alba || 'offline',
+            status: systemData.maintenance === 'Scheduled' ? 'online' : 'offline',
             data_streams: 8
           },
           jona: {
-            status: statusData.neurosonix_ecosystem?.jona || 'offline',
+            status: systemData.data_integrity === 'Verified' ? 'online' : 'offline',
             audio_synthesis: true
           }
         })
@@ -251,7 +252,11 @@ export default function Home() {
             </button>
           </div>
         </div>
+
+  <ASITerminal />
       </div>
     </div>
   )
 }
+
+

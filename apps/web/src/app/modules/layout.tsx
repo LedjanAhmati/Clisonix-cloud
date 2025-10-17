@@ -1,4 +1,4 @@
-/**
+﻿/**
  * NeuroSonix Modules Layout
  * Advanced neuroacoustic processing, EEG analysis, and industrial monitoring
  */
@@ -23,3 +23,4 @@ export default function ModulesLayout({
     </div>
   )
 }
+

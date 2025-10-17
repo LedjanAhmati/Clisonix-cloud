@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+psutil
+numpy
+librosa
+soundfile
+mne
+asyncpg
+redis
+boto3
+deep-translator
+SpeechRecognition
+pydub
+edge-tts
+requests

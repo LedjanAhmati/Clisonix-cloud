@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -229,6 +229,17 @@ export default function DataCollectionPage() {
     }
   ])
   const [isExporting, setIsExporting] = useState(false)
+  const [randomValue, setRandomValue] = useState(0)
+
+  // Render localized times only after client mount to avoid SSR/CSR hydration mismatches
+  const LocalTime = ({ timestamp }: { timestamp: string }) => {
+    const [timeStr, setTimeStr] = useState('')
+    useEffect(() => {
+      // populate time only on client after mount
+      setTimeStr(new Date(timestamp).toLocaleTimeString())
+    }, [timestamp])
+    return <span className="text-muted-foreground font-mono">{timeStr}</span>
+  }
 
   // Real-time updates simulation
   useEffect(() => {
@@ -254,6 +265,10 @@ export default function DataCollectionPage() {
 
     return () => clearInterval(interval)
   }, [])
+
+  useEffect(() => {
+    setRandomValue(Math.floor(Math.random() * 100));
+  }, []);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -487,7 +502,7 @@ export default function DataCollectionPage() {
               <div>
                 <p className="text-sm font-medium text-blue-600">Total Records</p>
                 <p className="text-3xl font-bold text-blue-900">{systemMetrics.totalRecords.toLocaleString()}</p>
-                <p className="text-xs text-blue-500 mt-1">+{Math.floor(Math.random() * 100)}/min</p>
+                <p className="text-xs text-blue-500 mt-1">+{randomValue}/min</p>
               </div>
               <Database className="h-8 w-8 text-blue-500" />
             </div>
@@ -677,9 +692,7 @@ export default function DataCollectionPage() {
                 {getSeverityIcon(event.severity)}
                 <div className="flex-1">
                   <div className="flex items-center gap-3 text-sm">
-                    <span className="text-muted-foreground font-mono">
-                      {new Date(event.timestamp).toLocaleTimeString()}
-                    </span>
+                    <LocalTime timestamp={event.timestamp} />
                     <Badge variant="outline" className="text-xs">
                       {event.category}
                     </Badge>
@@ -801,3 +814,5 @@ export default function DataCollectionPage() {
     </div>
   )
 }
+
+
