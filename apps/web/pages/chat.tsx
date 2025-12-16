@@ -1,4 +1,4 @@
-﻿import Head from 'next/head';
+import Head from 'next/head';
 import LiveChatTools from '../components/LiveChatTools';
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -37,10 +37,10 @@ const ChatPage = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/ask', {
+      const response = await fetch('http://localhost:8008/api/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: newMsg.content }),
+        body: JSON.stringify({ message: newMsg.content }),
       });
 
       const data = await response.json();
