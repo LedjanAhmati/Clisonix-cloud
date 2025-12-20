@@ -62,7 +62,7 @@ class CycleStatus(Enum):
 class AlignmentPolicy(Enum):
     """Politikat e alignment"""
     STRICT = "strict"              # Çdo gabim ndal
-    MODERATE = "moderate"          # Warning por vazhdon
+    MODERATE = "moderate"          # Warnings por vazhdon
     PERMISSIVE = "permissive"      # Vetëm log
     ETHICAL_GUARD = "ethical_guard" # JONA vendos
 
