@@ -331,7 +331,7 @@ Cycles respektojnë rregulla etike:
 | Politika | Përshkrimi | Përdorimi |
 |----------|-----------|-----------|
 | `STRICT` | Çdo gabim ndal cycle-in | Kërkim mjekësor |
-| `MODERATE` | Warning por vazhdon | Kërkim i përgjithshëm |
+| `MODERATE` | Warnings por vazhdon | Kërkim i përgjithshëm |
 | `PERMISSIVE` | Vetëm log | Monitorim ambiental |
 | `ETHICAL_GUARD` | JONA vendos | Tema sensitive |
 
